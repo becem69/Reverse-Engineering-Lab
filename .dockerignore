@@ -1,0 +1,8 @@
+**/build/
+**/bin/
+**/obj/
+**/target/
+**/__pycache__/
+*.pyc
+orchestrator/orchestrator-bin
+services/go-analyzer/go-analyzer-bin

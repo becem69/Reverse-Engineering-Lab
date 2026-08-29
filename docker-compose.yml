@@ -1,0 +1,98 @@
+services:
+  triage:
+    build:
+      context: .
+      dockerfile: services/triage/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  go-analyzer:
+    build:
+      context: .
+      dockerfile: services/go-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  rust-analyzer:
+    build:
+      context: .
+      dockerfile: services/rust-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  cpp-analyzer:
+    build:
+      context: .
+      dockerfile: services/cpp-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  shellcode-analyzer:
+    build:
+      context: .
+      dockerfile: services/shellcode-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  dotnet-analyzer:
+    build:
+      context: .
+      dockerfile: services/dotnet-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  python-analyzer:
+    build:
+      context: .
+      dockerfile: services/python-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  delphi-analyzer:
+    build:
+      context: .
+      dockerfile: services/delphi-analyzer/Dockerfile
+    networks: [lab-net]
+    volumes: [samples:/samples:ro]
+
+  ttp-engine:
+    build:
+      context: .
+      dockerfile: services/ttp-engine/Dockerfile
+    networks: [lab-net]
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    environment:
+      - TRIAGE_ADDR=triage:50051
+      - GO_ANALYZER_ADDR=go-analyzer:50052
+      - RUST_ANALYZER_ADDR=rust-analyzer:50053
+      - CPP_ANALYZER_ADDR=cpp-analyzer:50054
+      - DOTNET_ANALYZER_ADDR=dotnet-analyzer:50057
+      - PYTHON_ANALYZER_ADDR=python-analyzer:50058
+      - DELPHI_ANALYZER_ADDR=delphi-analyzer:50059
+      - SHELLCODE_ANALYZER_ADDR=shellcode-analyzer:50060
+      - TTP_ENGINE_ADDR=ttp-engine:50056
+    depends_on:
+      - triage
+      - go-analyzer
+      - rust-analyzer
+      - cpp-analyzer
+      - dotnet-analyzer
+      - python-analyzer
+      - delphi-analyzer
+      - shellcode-analyzer
+      - ttp-engine
+    volumes: [samples:/samples:ro]
+    networks: [lab-net]
+    ports: ["9000:9000"]
+
+networks:
+  lab-net:
+    driver: bridge
+
+volumes:
+  samples:
+    driver: local

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package malwarelab;
+
+option go_package = "malware-lab/shared/proto-gen/go;malwarelab";
+
+service Analyzer {
+  rpc Analyze (SampleRequest) returns (AnalysisResult);
+  rpc Capabilities (Empty) returns (CapabilitiesResponse);
+}
+
+message SampleRequest {
+  string sha256 = 1;
+  string sample_path = 2;
+  map<string, string> metadata = 3;
+}
+
+message AnalysisResult {
+  string analyzer_name = 1;
+  string format = 2;
+  string language = 3;
+  bool   is_packed = 4;
+  string packer_name = 5;
+  float  packer_confidence = 6;
+
+  repeated string strings_of_interest = 7;
+  repeated string imports = 8;
+  repeated string exports = 9;
+  repeated TTP ttps = 10;
+
+  string unpacked_sample_path = 11;
+
+  map<string, string> extra = 12;
+  string error = 13;
+}
+
+message TTP {
+  string technique_id = 1;
+  string technique_name = 2;
+  string tactic = 3;
+  string evidence = 4;
+  float  confidence = 5;
+}
+
+message CapabilitiesResponse {
+  repeated string supported_formats = 1;
+  repeated string supported_languages = 2;
+  string service_name = 3;
+}
+
+message Empty {}
