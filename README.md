@@ -22,7 +22,7 @@ Native (non-Docker) development is also possible for iterating on a single servi
 ## Setup
 
 ```bash
-git clone https://github.com/becem69/Reverse-Engineering-Lab.git RELab
+git clone <your-repo-url> RELab
 cd RELab
 docker compose build
 ```
@@ -75,7 +75,7 @@ Protobuf generates bindings for every language automatically from the single sou
 `orchestrator/cmd/main.go` is the only piece with a global view of the pipeline. It:
 
 1. **Registers all services** in an internal registry that maps `(format, language)` pairs to gRPC addresses (resolved via Docker Compose service names on the shared network).
-2. **Calls triage first**, sends the sample path and gets back a format (`PE`, `ELF`, `MachO`, `unknown`) and a language (`go`, `rust`, `dotnet`, `cpp`, `delphi`, `python`, `unknown`).
+2. **Calls triage first**, sends the sample path and gets back a format (`PE`, `ELF`, `MachO`, `unknown`) and a language (`go`, `rust`, `dotnet`, `cpp`, `delphi`, `python`, `unknown`). Triage does not detect "shellcode" as a language itself, raw/headerless payloads simply fail to match any known language marker and come back as `unknown`, which is how they get routed to the shellcode analyzer in the next step.
 3. **Routes to the language analyzer**, looks up the registry for a service matching both the detected format and language. If triage returned `unknown`, it falls back to the shellcode-analyzer.
 4. **Calls the TTP engine**, passes triage findings (packed status, packer name, language) as metadata for rule-based MITRE ATT&CK correlation.
 5. **Calls the report generator**, serializes all results to JSON and shells out to the Ruby report generator to produce the final report.
