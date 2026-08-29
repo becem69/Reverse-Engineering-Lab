@@ -22,7 +22,7 @@ Native (non-Docker) development is also possible for iterating on a single servi
 ## Setup
 
 ```bash
-git clone Reverse-Engineering-Lab RELab
+git clone <your-repo-url> RELab
 cd RELab
 docker compose build
 ```
@@ -111,6 +111,72 @@ Protobuf generates bindings for every language automatically from the single sou
 ### Stage 4 - Report generator (Ruby)
 
 `services/report-generator/report.rb` merges all analyzer outputs into one JSON report, de-duplicating TTPs found by multiple analyzers. `generate.rb` is the CLI entry point the orchestrator shells out to.
+
+---
+
+## Example Run
+
+Running the pipeline against a real compiled Go binary (`/tmp/hello_with_module`):
+
+```
+$ DEMO_SAMPLE_PATH=/tmp/hello_with_module ./orchestrator-bin
+
+2026/08/28 12:28:37 [1/3] calling triage at localhost:50051
+2026/08/28 12:28:38 triage result: format=ELF language=go packed=false packer=
+2026/08/28 12:28:38 [2/3] calling language analyzer at localhost:50052 (language=go)
+2026/08/28 12:28:39 language analyzer result: language=go extra=map[go_version:go1.26.5 main_module:example.com/hellomod main_module_version:(devel)]
+2026/08/28 12:28:39 [3/3] calling ttp-engine at localhost:50056
+2026/08/28 12:28:39 === FINAL RESULT ===
+2026/08/28 12:28:39 format=ELF language=go packed=false packer=
+2026/08/28 12:28:39 TTPs found: 1
+2026/08/28 12:28:39   - T1027: Obfuscated Files or Information (Defense Evasion) confidence=0.30
+2026/08/28 12:28:40 Report written to /tmp/relab_report_output.json
+2026/08/28 12:28:40 final report available at: /tmp/relab_report_output.json
+```
+
+Resulting `/tmp/relab_report_output.json`:
+
+```json
+{
+  "report_version": "1.0",
+  "generated_at": "2026-08-28T11:28:40Z",
+  "sample": {
+    "path": "/tmp/hello_with_module"
+  },
+  "findings": {
+    "format": "ELF",
+    "language": "go",
+    "is_packed": false,
+    "packer_name": "",
+    "imports": [],
+    "exports": [],
+    "strings_of_interest": [],
+    "extra": {
+      "entropy": "6.832",
+      "file_size": "2397166",
+      "is_pie": "False",
+      "num_sections": "26",
+      "go_version": "go1.26.5",
+      "main_module": "example.com/hellomod",
+      "main_module_version": "(devel)"
+    }
+  },
+  "ttps": [
+    {
+      "confidence": 0.3,
+      "evidence": "written in Go; statically-linked Go binaries are commonly used to evade signature-based detection and simplify cross-platform deployment",
+      "tactic": "Defense Evasion",
+      "technique_id": "T1027",
+      "technique_name": "Obfuscated Files or Information"
+    }
+  ],
+  "analyzers_run": [
+    "triage",
+    "go-analyzer",
+    "ttp-engine"
+  ]
+}
+```
 
 ---
 
