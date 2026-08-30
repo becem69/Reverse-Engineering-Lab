@@ -22,7 +22,7 @@ Native (non-Docker) development is also possible for iterating on a single servi
 ## Setup
 
 ```bash
-git clone <your-repo-url> RELab
+git clone https://github.com/becem69/Reverse-Engineering-Lab.git RELab
 cd RELab
 docker compose build
 ```
